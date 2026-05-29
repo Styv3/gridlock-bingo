@@ -59,6 +59,7 @@ export default function MapView({ objectives, categories, hoveredId, hoveredObje
   const [layout, setLayout] = useState(null);
   const [localHover, setLocalHover] = useState(null);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const [pinnedObj, setPinnedObj] = useState(null);
 
   const updateLayout = useCallback(() => {
     if (imgRef.current) setLayout(getImageLayout(imgRef.current));
@@ -84,9 +85,15 @@ export default function MapView({ objectives, categories, hoveredId, hoveredObje
 
   const localHoveredObjectiveId = localHover ? markers.find(m => m.key === localHover)?.objectiveId : null;
   const localHoveredObj = localHoveredObjectiveId ? objectives.find(o => o.id === localHoveredObjectiveId) : null;
-  const popupObj = localHoveredObj || hoveredObjective;
-  const popupCat = popupObj ? categories?.find(c => c.id === popupObj.categoryId) : null;
-  const popupCatColor = popupCat ? getCategoryBaseColor(popupCat) : '#888';
+  const activeHoverObj = localHoveredObj || hoveredObjective;
+
+  useEffect(() => {
+    if (activeHoverObj) setPinnedObj(activeHoverObj);
+  }, [activeHoverObj]);
+
+  const displayObj = activeHoverObj || pinnedObj;
+  const displayCat = displayObj ? categories?.find(c => c.id === displayObj.categoryId) : null;
+  const displayCatColor = displayCat ? getCategoryBaseColor(displayCat) : '#888';
 
   return (
     <div
@@ -110,19 +117,22 @@ export default function MapView({ objectives, categories, hoveredId, hoveredObje
         </div>
       )}
 
-      {popupObj && !isPlacing && (
+      {displayObj && !isPlacing && (
         <div className="map-popup">
-          <div className="map-popup-name">{popupObj.name}</div>
-          {popupCat && (
+          <div className="map-popup-header">
+            <div className="map-popup-name">{displayObj.name}</div>
+            <button className="map-popup-close" onClick={e => { e.stopPropagation(); setPinnedObj(null); }}>✕</button>
+          </div>
+          {displayCat && (
             <div className="map-popup-cat">
-              <span className="map-popup-dot" style={{ background: popupCatColor }} />
-              <span style={{ color: popupCatColor }}>{popupCat.name}</span>
+              <span className="map-popup-dot" style={{ background: displayCatColor }} />
+              <span style={{ color: displayCatColor }}>{displayCat.name}</span>
             </div>
           )}
-          {popupObj.description && (
-            <div className="map-popup-desc">{popupObj.description}</div>
+          {displayObj.description && (
+            <div className="map-popup-desc">{displayObj.description}</div>
           )}
-          {popupObj.anywhere && (
+          {displayObj.anywhere && (
             <div className="map-popup-anywhere">Réalisable n'importe où sur la carte</div>
           )}
         </div>
