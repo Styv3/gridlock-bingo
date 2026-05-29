@@ -89,7 +89,7 @@ export default function MapView({ objectives, hoveredId, isPlacing, onMapClick, 
     >
       <img
         ref={imgRef}
-        src="/map.jpg"
+        src={`${import.meta.env.BASE_URL}map.jpg`}
         alt="Carte Gridlock"
         className="map-image"
         onLoad={() => { setImgLoaded(true); updateLayout(); }}
