@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState, useCallback } from 'react';
+import { getCategoryBaseColor } from '../colors';
 
 const MARKER_BASE = 16;
 const MARKER_HOVER = 26;
@@ -52,7 +53,7 @@ function buildMarkerList(objectives, layout) {
   });
 }
 
-export default function MapView({ objectives, hoveredId, isPlacing, onMapClick, onCancelPlace }) {
+export default function MapView({ objectives, categories, hoveredId, hoveredObjective, isPlacing, onMapClick, onCancelPlace }) {
   const imgRef = useRef(null);
   const containerRef = useRef(null);
   const [layout, setLayout] = useState(null);
@@ -81,6 +82,12 @@ export default function MapView({ objectives, hoveredId, isPlacing, onMapClick, 
 
   const markers = buildMarkerList(objectives, layout);
 
+  const localHoveredObjectiveId = localHover ? markers.find(m => m.key === localHover)?.objectiveId : null;
+  const localHoveredObj = localHoveredObjectiveId ? objectives.find(o => o.id === localHoveredObjectiveId) : null;
+  const popupObj = localHoveredObj || hoveredObjective;
+  const popupCat = popupObj ? categories?.find(c => c.id === popupObj.categoryId) : null;
+  const popupCatColor = popupCat ? getCategoryBaseColor(popupCat) : '#888';
+
   return (
     <div
       ref={containerRef}
@@ -100,6 +107,24 @@ export default function MapView({ objectives, hoveredId, isPlacing, onMapClick, 
         <div className="map-placeholder">
           <p>Image de la carte introuvable.</p>
           <p>Sauvegardez la carte sous <code>public/map.jpg</code> dans le dossier du projet.</p>
+        </div>
+      )}
+
+      {popupObj && !isPlacing && (
+        <div className="map-popup">
+          <div className="map-popup-name">{popupObj.name}</div>
+          {popupCat && (
+            <div className="map-popup-cat">
+              <span className="map-popup-dot" style={{ background: popupCatColor }} />
+              <span style={{ color: popupCatColor }}>{popupCat.name}</span>
+            </div>
+          )}
+          {popupObj.description && (
+            <div className="map-popup-desc">{popupObj.description}</div>
+          )}
+          {popupObj.anywhere && (
+            <div className="map-popup-anywhere">Réalisable n'importe où sur la carte</div>
+          )}
         </div>
       )}
 

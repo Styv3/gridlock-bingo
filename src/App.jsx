@@ -111,6 +111,7 @@ export default function App() {
   const activeObjectives = activeObjectiveIds.map(id => objectives.find(o => o.id === id)).filter(Boolean);
   const mapObjectives = activeObjectives.filter(o => !o.anywhere);
   const anywhereObjectives = activeObjectives.filter(o => o.anywhere);
+  const hoveredObjective = hoveredId ? objectives.find(o => o.id === hoveredId) : null;
 
   return (
     <div className="app">
@@ -165,6 +166,7 @@ export default function App() {
             objectives={mapObjectives}
             categories={categories}
             hoveredId={hoveredId}
+            hoveredObjective={hoveredObjective}
             isPlacing={isPlacing}
             onMapClick={handleMapClick}
             onCancelPlace={() => setIsPlacing(false)}
