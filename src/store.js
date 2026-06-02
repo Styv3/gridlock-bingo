@@ -3,6 +3,7 @@ import { useReducer, useEffect } from 'react';
 const STORAGE_KEY = 'gridlock-bingo-v1';
 const MAX_GRID_SIZE = 25;
 const MAX_OBJECTIVE_COPIES = 2;
+const QUEST_PLACEHOLDER_TYPE = 'quest-placeholder';
 
 export const DEFAULT_CATEGORIES = [
   { id: 'simple',   name: 'Simple',   hue: 120, spread: 50 },
@@ -23,12 +24,21 @@ function createGridSlot(objectiveId) {
   return { slotId: crypto.randomUUID(), objectiveId };
 }
 
+function createQuestPlaceholderSlot() {
+  return { slotId: crypto.randomUUID(), type: QUEST_PLACEHOLDER_TYPE, label: 'Quest' };
+}
+
 function normalizeGridSlot(slot) {
   if (!slot) return null;
   if (typeof slot === 'string') return createGridSlot(slot);
   if (slot.objectiveId) return {
     slotId: slot.slotId || crypto.randomUUID(),
     objectiveId: slot.objectiveId,
+  };
+  if (slot.type === QUEST_PLACEHOLDER_TYPE) return {
+    slotId: slot.slotId || crypto.randomUUID(),
+    type: QUEST_PLACEHOLDER_TYPE,
+    label: slot.label || 'Quest',
   };
   return null;
 }
@@ -123,6 +133,13 @@ function reducer(state, action) {
         bingoGrid: [...state.bingoGrid, createGridSlot(id)],
       };
     }
+
+    case 'ADD_QUEST_PLACEHOLDER':
+      if (state.bingoGrid.length >= MAX_GRID_SIZE) return state;
+      return {
+        ...state,
+        bingoGrid: [...state.bingoGrid, createQuestPlaceholderSlot()],
+      };
 
     case 'SET_BINGO_GRID':
       return { ...state, bingoGrid: normalizeBingoGrid(action.payload) };

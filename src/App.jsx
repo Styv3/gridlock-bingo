@@ -180,6 +180,7 @@ export default function App() {
               objectives={objectives}
               categories={categories}
               onHover={setHoveredId}
+              onAddQuestPlaceholder={() => dispatch({ type: 'ADD_QUEST_PLACEHOLDER' })}
               onGridChange={grid => dispatch({ type: 'SET_BINGO_GRID', payload: grid })}
             />
           )}
