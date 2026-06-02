@@ -18,6 +18,7 @@ export default function Sidebar({
   };
 
   const maxReached = bingoGrid.length >= 25;
+  const hasQuestPlaceholder = bingoGrid.some(slot => slot.type === 'quest-placeholder');
 
   return (
     <aside className="sidebar">
@@ -75,7 +76,8 @@ export default function Sidebar({
             const cat = categories.find(c => c.id === obj.categoryId);
             const isActive = activeObjectiveIds.includes(obj.id);
             const gridCopies = bingoGrid.filter(slot => slot.objectiveId === obj.id).length;
-            const isDisabled = !isActive && maxReached;
+            const canReplaceQuestPlaceholder = !isActive && obj.categoryId === 'quest' && hasQuestPlaceholder;
+            const isDisabled = !isActive && maxReached && !canReplaceQuestPlaceholder;
             const canAddCopy = isActive && gridCopies < 2 && !maxReached;
             const addCopyTitle = gridCopies === 0
               ? 'Ajouter dans la grille'
@@ -95,7 +97,7 @@ export default function Sidebar({
                   disabled={isDisabled}
                   onChange={() => onToggle(obj.id)}
                   onClick={e => e.stopPropagation()}
-                  title={isDisabled ? 'Grille pleine' : ''}
+                  title={isDisabled ? 'Grille pleine' : canReplaceQuestPlaceholder ? 'Remplacera le premier placeholder Quest' : ''}
                 />
                 <span className="obj-dot" style={{ background: obj.colorVariant }} />
                 <span className="obj-name" title={obj.name}>{obj.name}</span>

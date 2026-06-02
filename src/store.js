@@ -66,6 +66,16 @@ function countObjectiveCopies(bingoGrid, objectiveId) {
   return bingoGrid.filter(slot => slot.objectiveId === objectiveId).length;
 }
 
+function isQuestObjective(objectives, objectiveId) {
+  return objectives.some(o => o.id === objectiveId && o.categoryId === 'quest');
+}
+
+function replaceFirstQuestPlaceholder(bingoGrid, objectiveId) {
+  const placeholderIdx = bingoGrid.findIndex(slot => slot.type === QUEST_PLACEHOLDER_TYPE);
+  if (placeholderIdx < 0) return null;
+  return bingoGrid.map((slot, i) => i === placeholderIdx ? createGridSlot(objectiveId) : slot);
+}
+
 function getInitialState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
@@ -110,7 +120,16 @@ function reducer(state, action) {
           bingoGrid: state.bingoGrid.filter(slot => slot.objectiveId !== id),
         };
       }
-      if (state.bingoGrid.length >= MAX_GRID_SIZE) return state;
+      if (state.bingoGrid.length >= MAX_GRID_SIZE) {
+        if (!isQuestObjective(state.objectives, id)) return state;
+        const bingoGrid = replaceFirstQuestPlaceholder(state.bingoGrid, id);
+        if (!bingoGrid) return state;
+        return {
+          ...state,
+          activeObjectiveIds: [...state.activeObjectiveIds, id],
+          bingoGrid,
+        };
+      }
       return {
         ...state,
         activeObjectiveIds: [...state.activeObjectiveIds, id],
