@@ -1,4 +1,13 @@
-# React + Vite
+# Gridlock Bingo
+
+This repository contains:
+
+- a React/Vite web prep tool for Gridlock Bingo boards;
+- a Paper Minecraft plugin MVP in `minecraft-plugin/` for simulating a Gridlock game from the exported JSON.
+
+See `minecraft-plugin/README.md` for plugin build and server usage instructions.
+
+## React + Vite
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

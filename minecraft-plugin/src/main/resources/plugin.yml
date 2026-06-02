@@ -1,0 +1,18 @@
+name: GridlockSimulator
+version: 0.1.0
+main: com.styv3.gridlock.GridlockPlugin
+api-version: '1.21'
+author: Styv3
+description: Simulates Gridlock Bingo games from exported objective JSON.
+commands:
+  gridlock:
+    description: Controls the Gridlock simulation.
+    usage: /gridlock <import|start|stop|reset|board|score|team|complete|detectors>
+    aliases: [gl]
+permissions:
+  gridlock.admin:
+    description: Allows managing Gridlock games.
+    default: op
+  gridlock.play:
+    description: Allows players to use basic Gridlock commands.
+    default: true
