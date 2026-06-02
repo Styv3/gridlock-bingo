@@ -104,27 +104,23 @@ export default function Sidebar({
                     x{gridCopies}
                   </span>
                 )}
+                {isActive && gridCopies < 2 && (
+                  <button
+                    className="obj-grid-add-btn"
+                    onClick={e => { e.stopPropagation(); onAddGridPlacement(obj.id); }}
+                    disabled={!canAddCopy}
+                    title={maxReached ? 'Grille pleine' : addCopyTitle}
+                  >
+                    +
+                  </button>
+                )}
                 {obj.anywhere && <span className="anywhere-tag" title="Partout">∞</span>}
                 {cat && (
-                  <span className="obj-category-slot">
-                    <span className="obj-grid-add-slot">
-                      {isActive && gridCopies < 2 && (
-                        <button
-                          className="obj-grid-add-btn"
-                          onClick={e => { e.stopPropagation(); onAddGridPlacement(obj.id); }}
-                          disabled={!canAddCopy}
-                          title={maxReached ? 'Grille pleine' : addCopyTitle}
-                        >
-                          +
-                        </button>
-                      )}
-                    </span>
-                    <span
-                      className="obj-cat-tag"
-                      style={{ background: getCategoryBaseColor(cat) + '22', color: getCategoryBaseColor(cat) }}
-                    >
-                      {cat.name}
-                    </span>
+                  <span
+                    className="obj-cat-tag"
+                    style={{ background: getCategoryBaseColor(cat) + '22', color: getCategoryBaseColor(cat) }}
+                  >
+                    {cat.name}
                   </span>
                 )}
                 <button

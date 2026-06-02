@@ -194,22 +194,6 @@ body {
   title: 'Réalisable partout';
 }
 
-.obj-category-slot {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
-}
-
-.obj-grid-add-slot {
-  width: 18px;
-  height: 18px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
 .obj-cat-tag {
   font-size: 10px;
   padding: 1px 5px;
