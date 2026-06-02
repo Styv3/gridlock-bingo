@@ -2,9 +2,20 @@ import { useState } from 'react';
 
 const QUEST_PLACEHOLDER_TYPE = 'quest-placeholder';
 
+function getCategoryCellStyle(obj, categories) {
+  const cat = categories.find(c => c.id === obj.categoryId);
+  const hue = cat?.hue ?? 0;
+  return {
+    '--bingo-category-bg': `linear-gradient(180deg, hsla(${hue}, 72%, 52%, 0.42), hsla(${hue}, 72%, 34%, 0.32))`,
+    '--bingo-category-border': `hsla(${hue}, 76%, 66%, 0.78)`,
+    '--bingo-category-inner': `hsla(${hue}, 76%, 72%, 0.2)`,
+  };
+}
+
 export default function BingoGrid({
   bingoGrid,
   objectives,
+  categories,
   onHover,
   onAddQuestPlaceholder,
   onGridChange,
@@ -92,11 +103,12 @@ export default function BingoGrid({
             );
           }
           const label = obj.name.length > 18 ? obj.name.slice(0, 16) + '…' : obj.name;
+          const cat = categories.find(c => c.id === obj.categoryId);
           return (
             <div
               key={slot.slotId}
-              className={`bingo-cell${isDragging ? ' dragging' : ''}${isDragOver ? ' drag-over' : ''}`}
-              style={{ background: obj.colorVariant + '55', borderColor: obj.colorVariant + '99' }}
+              className={`bingo-cell bingo-cell-objective${isDragging ? ' dragging' : ''}${isDragOver ? ' drag-over' : ''}`}
+              style={getCategoryCellStyle(obj, categories)}
               draggable
               onDragStart={() => setDragIdx(i)}
               onDragOver={e => { e.preventDefault(); setDragOverIdx(i); }}
@@ -105,7 +117,7 @@ export default function BingoGrid({
               onDragLeave={() => setDragOverIdx(null)}
               onMouseEnter={() => onHover(objectiveId)}
               onMouseLeave={() => onHover(null)}
-              title={obj.name}
+              title={cat ? `${obj.name} (${cat.name})` : obj.name}
             >
               {label}
             </div>

@@ -531,6 +531,11 @@ body {
   font-size: 16px;
   cursor: default;
 }
+.bingo-cell-objective {
+  background: var(--bingo-category-bg);
+  border-color: var(--bingo-category-border);
+  box-shadow: inset 0 0 0 1px var(--bingo-category-inner);
+}
 .bingo-cell-quest {
   background: rgba(255, 176, 88, 0.22);
   border-color: rgba(255, 176, 88, 0.58);
@@ -568,6 +573,11 @@ body {
 .bingo-cell:not(.empty):hover {
   transform: scale(1.04);
   box-shadow: 0 0 0 1.5px rgba(255,255,255,0.3);
+}
+.bingo-cell-objective:hover {
+  box-shadow:
+    inset 0 0 0 1px var(--bingo-category-inner),
+    0 0 0 1.5px var(--bingo-category-border);
 }
 
 /* ── Legend ─────────────────────────────────────── */
