@@ -25,8 +25,8 @@ final class GridlockTeam {
         return score;
     }
 
-    void addPoint() {
-        score++;
+    void addPoints(int points) {
+        score += points;
     }
 
     void resetScore() {

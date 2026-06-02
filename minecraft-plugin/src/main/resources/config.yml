@@ -1,3 +1,7 @@
 default-import-file: gridlock-bingo.json
 auto-start-after-import: false
 broadcast-completions: true
+enable-total-gridlock: true
+apply-gridlock-world-rules: true
+apply-gridlock-spawn-rates: true
+apply-gridlock-loot: true

@@ -58,12 +58,36 @@ The plugin supports explicit detector metadata on objectives:
 
 Supported detector types:
 
+- `totem_resurrect`
 - `craft_item`
 - `place_block`
+- `place_at_height_limit`
 - `break_block`
 - `consume_item`
 - `kill_entity`
+- `kill_opponent`
 - `item_frame_item`
 - `damage_from_entity`
+- `smelt_item`
+- `obtain_item`
+- `shear_entity`
+- `use_item_on_entity`
+- `hit_opponent_with_item`
+- `projectile_hit_entity`
+- `projectile_hit_opponent`
+- `fishing_rod_opponent`
+- `ignite_opponent`
 
 If no `detector` is present, the plugin tries conservative heuristics from the description. It intentionally skips ambiguous goals instead of awarding false positives.
+
+## Gridlock rules implemented
+
+- Official category scoring: Simple `1`, Complex `2`, Team `2`, Opponent `3`, Quest `3/3/4/4/5` based on Quest order in the board.
+- Gridline bonuses for completed rows, columns, and diagonals. A Gridline gives the total value of its five squares.
+- Duplicate objective slots are scored independently by slot id.
+- Total Gridlock early stop when a team exceeds half of the available board points.
+- Keep Inventory and disabled weather cycle when the game starts.
+- Animal spawn tick delay divided by `10`, monster spawn tick delay multiplied by `5`.
+- Loot tweaks for Endermen, Drowned holding Tridents, and Wither Skeleton skull chance.
+
+Guaranteed mob spawns are intentionally not implemented yet.
