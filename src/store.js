@@ -1,6 +1,8 @@
 import { useReducer, useEffect } from 'react';
 
 const STORAGE_KEY = 'gridlock-bingo-v1';
+const MAX_GRID_SIZE = 25;
+const MAX_OBJECTIVE_COPIES = 2;
 
 export const DEFAULT_CATEGORIES = [
   { id: 'simple',   name: 'Simple',   hue: 120, spread: 50 },
@@ -17,14 +19,53 @@ const DEFAULT_STATE = {
   bingoGrid: [],
 };
 
+function createGridSlot(objectiveId) {
+  return { slotId: crypto.randomUUID(), objectiveId };
+}
+
+function normalizeGridSlot(slot) {
+  if (!slot) return null;
+  if (typeof slot === 'string') return createGridSlot(slot);
+  if (slot.objectiveId) return {
+    slotId: slot.slotId || crypto.randomUUID(),
+    objectiveId: slot.objectiveId,
+  };
+  return null;
+}
+
+function normalizeBingoGrid(bingoGrid) {
+  if (!Array.isArray(bingoGrid)) return [];
+  return bingoGrid.map(normalizeGridSlot).filter(Boolean).slice(0, MAX_GRID_SIZE);
+}
+
+function normalizeState(data) {
+  const state = { ...DEFAULT_STATE, ...data };
+  const activeObjectiveIds = Array.isArray(state.activeObjectiveIds)
+    ? [...new Set(state.activeObjectiveIds.filter(Boolean))]
+    : [];
+
+  return {
+    ...state,
+    categories: state.categories || DEFAULT_CATEGORIES,
+    activeObjectiveIds,
+    bingoGrid: normalizeBingoGrid(state.bingoGrid),
+  };
+}
+
+function countObjectiveCopies(bingoGrid, objectiveId) {
+  return bingoGrid.filter(slot => slot.objectiveId === objectiveId).length;
+}
+
 function getInitialState() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved);
-      return { ...DEFAULT_STATE, ...parsed, categories: parsed.categories || DEFAULT_CATEGORIES };
+      return normalizeState(parsed);
     }
-  } catch {}
+  } catch {
+    return DEFAULT_STATE;
+  }
   return DEFAULT_STATE;
 }
 
@@ -45,7 +86,7 @@ function reducer(state, action) {
         ...state,
         objectives: state.objectives.filter(o => o.id !== id),
         activeObjectiveIds: state.activeObjectiveIds.filter(aid => aid !== id),
-        bingoGrid: state.bingoGrid.filter(gid => gid !== id),
+        bingoGrid: state.bingoGrid.filter(slot => slot.objectiveId !== id),
       };
     }
 
@@ -56,19 +97,35 @@ function reducer(state, action) {
         return {
           ...state,
           activeObjectiveIds: state.activeObjectiveIds.filter(aid => aid !== id),
-          bingoGrid: state.bingoGrid.filter(gid => gid !== id),
+          bingoGrid: state.bingoGrid.filter(slot => slot.objectiveId !== id),
         };
       }
-      if (state.activeObjectiveIds.length >= 25) return state;
+      if (state.bingoGrid.length >= MAX_GRID_SIZE) return state;
       return {
         ...state,
         activeObjectiveIds: [...state.activeObjectiveIds, id],
-        bingoGrid: [...state.bingoGrid, id],
+        bingoGrid: [...state.bingoGrid, createGridSlot(id)],
+      };
+    }
+
+    case 'ADD_GRID_PLACEMENT': {
+      const id = action.payload;
+      if (state.bingoGrid.length >= MAX_GRID_SIZE) return state;
+      if (countObjectiveCopies(state.bingoGrid, id) >= MAX_OBJECTIVE_COPIES) return state;
+
+      const activeObjectiveIds = state.activeObjectiveIds.includes(id)
+        ? state.activeObjectiveIds
+        : [...state.activeObjectiveIds, id];
+
+      return {
+        ...state,
+        activeObjectiveIds,
+        bingoGrid: [...state.bingoGrid, createGridSlot(id)],
       };
     }
 
     case 'SET_BINGO_GRID':
-      return { ...state, bingoGrid: action.payload };
+      return { ...state, bingoGrid: normalizeBingoGrid(action.payload) };
 
     case 'RESET_GAME':
       return { ...state, activeObjectiveIds: [], bingoGrid: [] };
@@ -77,7 +134,7 @@ function reducer(state, action) {
       return { ...state, categories: [...state.categories, action.payload] };
 
     case 'IMPORT_DATA':
-      return { ...DEFAULT_STATE, ...action.payload };
+      return normalizeState(action.payload);
 
     default:
       return state;
@@ -88,7 +145,11 @@ export function useStore() {
   const [state, dispatch] = useReducer(reducer, null, getInitialState);
 
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      // Ignore storage failures so the app keeps running in restricted browsers.
+    }
   }, [state]);
 
   return { state, dispatch };

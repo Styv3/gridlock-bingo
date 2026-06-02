@@ -19,6 +19,7 @@ function downloadFile(content, filename, type) {
 export default function App() {
   const { state, dispatch } = useStore();
   const { categories, objectives, activeObjectiveIds, bingoGrid } = state;
+  const gridCount = bingoGrid.length;
 
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState(null);
@@ -118,8 +119,8 @@ export default function App() {
       <header className="app-header">
         <h1>Gridlock Bingo Prep</h1>
         <div className="header-count">
-          <span className={activeObjectiveIds.length === 25 ? 'count-full' : 'count-num'}>
-            {activeObjectiveIds.length}
+          <span className={gridCount === 25 ? 'count-full' : 'count-num'}>
+            {gridCount}
           </span>
           <span className="count-label">/ 25</span>
         </div>
@@ -146,12 +147,14 @@ export default function App() {
           objectives={objectives}
           categories={categories}
           activeObjectiveIds={activeObjectiveIds}
+          bingoGrid={bingoGrid}
           hoveredId={hoveredId}
           search={search}
           catFilter={catFilter}
           onSearch={setSearch}
           onCatFilter={setCatFilter}
           onToggle={id => dispatch({ type: 'TOGGLE_ACTIVE', payload: id })}
+          onAddGridPlacement={id => dispatch({ type: 'ADD_GRID_PLACEMENT', payload: id })}
           onEdit={openEdit}
           onAdd={openAdd}
           onAddCategory={name => {

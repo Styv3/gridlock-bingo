@@ -88,7 +88,9 @@ export default function MapView({ objectives, categories, hoveredId, hoveredObje
   const activeHoverObj = localHoveredObj || hoveredObjective;
 
   useEffect(() => {
-    if (activeHoverObj) setPinnedObj(activeHoverObj);
+    if (!activeHoverObj) return undefined;
+    const frame = requestAnimationFrame(() => setPinnedObj(activeHoverObj));
+    return () => cancelAnimationFrame(frame);
   }, [activeHoverObj]);
 
   const displayObj = activeHoverObj || pinnedObj;

@@ -1,9 +1,9 @@
 import { getCategoryBaseColor } from '../colors';
 
 export default function Sidebar({
-  objectives, categories, activeObjectiveIds, hoveredId,
+  objectives, categories, activeObjectiveIds, bingoGrid, hoveredId,
   search, catFilter, onSearch, onCatFilter,
-  onToggle, onEdit, onAdd, onAddCategory, onHover,
+  onToggle, onAddGridPlacement, onEdit, onAdd, onAddCategory, onHover,
 }) {
   const filtered = objectives.filter(o => {
     const q = search.toLowerCase();
@@ -17,7 +17,7 @@ export default function Sidebar({
     if (name?.trim()) onAddCategory(name.trim());
   };
 
-  const maxReached = activeObjectiveIds.length >= 25;
+  const maxReached = bingoGrid.length >= 25;
 
   return (
     <aside className="sidebar">
@@ -74,7 +74,12 @@ export default function Sidebar({
           filtered.map(obj => {
             const cat = categories.find(c => c.id === obj.categoryId);
             const isActive = activeObjectiveIds.includes(obj.id);
+            const gridCopies = bingoGrid.filter(slot => slot.objectiveId === obj.id).length;
             const isDisabled = !isActive && maxReached;
+            const canAddCopy = isActive && gridCopies < 2 && !maxReached;
+            const addCopyTitle = gridCopies === 0
+              ? 'Ajouter dans la grille'
+              : 'Ajouter une 2e occurrence dans la grille';
             const isHighlighted = hoveredId === obj.id;
             return (
               <div
@@ -90,10 +95,15 @@ export default function Sidebar({
                   disabled={isDisabled}
                   onChange={() => onToggle(obj.id)}
                   onClick={e => e.stopPropagation()}
-                  title={isDisabled ? '25 objectifs déjà sélectionnés' : ''}
+                  title={isDisabled ? 'Grille pleine' : ''}
                 />
                 <span className="obj-dot" style={{ background: obj.colorVariant }} />
                 <span className="obj-name" title={obj.name}>{obj.name}</span>
+                {gridCopies > 1 && (
+                  <span className="obj-grid-count" title={`${gridCopies} occurrences dans la grille`}>
+                    x{gridCopies}
+                  </span>
+                )}
                 {obj.anywhere && <span className="anywhere-tag" title="Partout">∞</span>}
                 {cat && (
                   <span
@@ -102,6 +112,16 @@ export default function Sidebar({
                   >
                     {cat.name}
                   </span>
+                )}
+                {isActive && gridCopies < 2 && (
+                  <button
+                    className="obj-grid-add-btn"
+                    onClick={e => { e.stopPropagation(); onAddGridPlacement(obj.id); }}
+                    disabled={!canAddCopy}
+                    title={maxReached ? 'Grille pleine' : addCopyTitle}
+                  >
+                    +
+                  </button>
                 )}
                 <button
                   className="obj-edit-btn"

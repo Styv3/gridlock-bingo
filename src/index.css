@@ -202,6 +202,42 @@ body {
   white-space: nowrap;
 }
 
+.obj-grid-count {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 5px;
+  border-radius: 8px;
+  color: #69f0ae;
+  background: rgba(105, 240, 174, 0.12);
+  border: 1px solid rgba(105, 240, 174, 0.26);
+  flex-shrink: 0;
+  line-height: 1.2;
+}
+
+.obj-grid-add-btn {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  color: var(--text-dim);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+
+.obj-item:hover .obj-grid-add-btn { opacity: 1; }
+.obj-grid-add-btn:hover:not(:disabled) { color: var(--text); border-color: var(--accent); }
+.obj-grid-add-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+
 .obj-edit-btn {
   background: none;
   border: none;

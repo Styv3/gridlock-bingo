@@ -1,5 +1,4 @@
 import { getObjectiveColor } from '../colors';
-import { getCategoryBaseColor } from '../colors';
 
 export default function ObjectiveModal({
   modal, categories, objectives,

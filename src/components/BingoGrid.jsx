@@ -5,8 +5,13 @@ export default function BingoGrid({ bingoGrid, objectives, onHover, onGridChange
   const [dragOverIdx, setDragOverIdx] = useState(null);
 
   const cells = Array.from({ length: 25 }, (_, i) => {
-    const id = bingoGrid[i] ?? null;
-    return { id, obj: id ? (objectives.find(o => o.id === id) ?? null) : null };
+    const slot = bingoGrid[i] ?? null;
+    const objectiveId = slot?.objectiveId ?? null;
+    return {
+      slot,
+      objectiveId,
+      obj: objectiveId ? (objectives.find(o => o.id === objectiveId) ?? null) : null,
+    };
   });
 
   const handleDrop = (targetIdx) => {
@@ -22,7 +27,7 @@ export default function BingoGrid({ bingoGrid, objectives, onHover, onGridChange
     <div className="bingo-grid">
       <div className="bingo-title">Bingo 5 × 5</div>
       <div className="bingo-cells">
-        {cells.map(({ id, obj }, i) => {
+        {cells.map(({ slot, objectiveId, obj }, i) => {
           const isDragging = dragIdx === i;
           const isDragOver = dragOverIdx === i;
           if (!obj) {
@@ -41,7 +46,7 @@ export default function BingoGrid({ bingoGrid, objectives, onHover, onGridChange
           const label = obj.name.length > 18 ? obj.name.slice(0, 16) + '…' : obj.name;
           return (
             <div
-              key={id}
+              key={slot.slotId}
               className={`bingo-cell${isDragging ? ' dragging' : ''}${isDragOver ? ' drag-over' : ''}`}
               style={{ background: obj.colorVariant + '55', borderColor: obj.colorVariant + '99' }}
               draggable
@@ -50,7 +55,7 @@ export default function BingoGrid({ bingoGrid, objectives, onHover, onGridChange
               onDrop={() => handleDrop(i)}
               onDragEnd={() => { setDragIdx(null); setDragOverIdx(null); }}
               onDragLeave={() => setDragOverIdx(null)}
-              onMouseEnter={() => onHover(id)}
+              onMouseEnter={() => onHover(objectiveId)}
               onMouseLeave={() => onHover(null)}
               title={obj.name}
             >
